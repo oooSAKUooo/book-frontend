@@ -44,7 +44,17 @@ const App = () => {
     }
   };
 
+  const validateInputs = (book) => {
+    if (!book.title || !book.author || !book.image_url) {
+      alert("Please fill in all fields.");
+      return false;
+    }
+    return true;
+  };
+
   const handleCreateBook = async () => {
+    if (!validateInputs(newBook)) return;  
+
     if (!(await checkPassword())) return;
     try {
       const response = await axios.post(`${uri}/books`, newBook);
@@ -60,11 +70,14 @@ const App = () => {
   };
 
   const handleUpdateBook = async () => {
-    if (!(await checkPassword())) return;
+    if (!validateInputs(editBook)) return;
+
+     if (!(await checkPassword())) return;
     try {
       await axios.put(`${uri}/books/${editBook._id}`, {
         title: editBook.title,
         author: editBook.author,
+        image_url: editBook.image_url,
       });
       setBooks((prev) =>
         prev.map((book) => (book._id === editBook._id ? editBook : book))
@@ -77,6 +90,7 @@ const App = () => {
 
   const handleDeleteBook = async (bookId) => {
     if (!(await checkPassword())) return;
+
     try {
       await axios.delete(`${uri}/books/${bookId}`);
       setBooks((prev) => prev.filter((book) => book._id !== bookId));
